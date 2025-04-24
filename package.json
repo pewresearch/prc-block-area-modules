@@ -1,0 +1,24 @@
+{
+    "name": "@pewresearch/prc-block-area-modules",
+    "version": "1.0.0",
+    "description": "Block Area Modules provides an editorially curated method for adding content to areas of a block theme.",
+    "scripts": {
+        "build": "wp-scripts build --experimental-modules --webpack-copy-php; wp-scripts build-blocks-manifest",
+        "test": "wp-scripts test-playwright",
+        "test:env:start": "wp-env start",
+        "test:env:stop": "wp-env stop",
+        "test:env:clean": "wp-env clean all && wp-env start",
+        "test:env:destroy": "wp-env destroy"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.51.1",
+        "@wordpress/e2e-test-utils-playwright": "^1.21.0",
+        "@wordpress/env": "^10.21.0",
+        "@wordpress/scripts": "^30.14.1"
+    },
+    "dependencies": {
+        "@wordpress/icons": "^10.21.0",
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.0"
+    }
+}
