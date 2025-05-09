@@ -1,7 +1,7 @@
 {
-    "name": "@pewresearch/prc-block-area-modules",
+    "name": "@prc/block-area-modules",
     "version": "1.0.0",
-    "description": "Block Area Modules provides an editorially curated method for adding content to areas of a block theme.",
+    "description": "PRC Block Area Modules provides an editorially curated method for adding content to areas of a block theme.",
     "scripts": {
         "build": "wp-scripts build --experimental-modules --webpack-copy-php; wp-scripts build-blocks-manifest",
         "test": "wp-scripts test-playwright",
