@@ -143,7 +143,13 @@ class Block_Area_Context_Provider {
 		}
 		if ( $query->is_archive() && $query->is_category() && $query->is_main_query() ) {
 			// Look for Topic-Lede block-area story items and exclude them from the main query.
-			$this->query_block_module_for_story_items( 'topic-lede', $query->get_queried_object()->slug );
+			$queried_object = $query->get_queried_object();
+			if ( $queried_object instanceof WP_Term ) {
+				$category_slug = $queried_object->slug;
+			} else {
+				$category_slug = '';
+			}
+			$this->query_block_module_for_story_items( 'topic-lede', $category_slug );
 			$not_in = $query->get( 'post__not_in' );
 			$query->set( 'post__not_in', array_merge( $not_in, $this->collected_story_item_ids ) );
 			return $query;
