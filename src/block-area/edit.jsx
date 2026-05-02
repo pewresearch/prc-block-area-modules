@@ -8,7 +8,7 @@ import { InnerBlocksAsSyncedContent } from '@prc/components';
 /**
  * WordPress Dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
@@ -29,6 +29,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 		taxonomyName,
 		taxonomyTermSlug,
 		inheritTermFromTemplate,
+		blockAreaQueryComplete,
 	} = attributes;
 	const { templateSlug } = context;
 
@@ -40,9 +41,10 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 	const isTaxonomyTemplate = useMemo(() => {
 		return (
 			undefined !== templateSlug &&
+			!!taxonomyName &&
 			templateSlug.includes(`${taxonomyName}-`)
 		);
-	}, [templateSlug]);
+	}, [templateSlug, taxonomyName]);
 
 	// If we are inheriting the term from the template we need to set the term slug to the template slug.
 	const taxTermSlug = useMemo(() => {
@@ -59,6 +61,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 		isTaxonomyTemplate,
 		templateSlug,
 		taxonomyTermSlug,
+		taxonomyName,
 	]);
 
 	const { blockAreaName, blockAreaId, taxonomyTermName, taxonomyTermId } =
@@ -80,7 +83,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 		};
 	}, [taxonomyTermId, taxonomyTermName, taxonomyTermSlug]);
 
-	const { blockModules, hasResolved, isResolving } = useBlockModules({
+	const { blockModules, isResolving } = useBlockModules({
 		enabled: true,
 		blockAreaId: blockArea?.id,
 		taxonomyTermId: taxonomy?.id,
@@ -102,9 +105,8 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 	const blockModule = useMemo(() => {
 		if (blockModuleId) {
 			const match = blockModules.find(
-				(blockModule) => blockModule.id === blockModuleId
+				(module) => module.id === blockModuleId
 			);
-			console.log('Matching block_module :', match, blockModules);
 			return {
 				id: blockModuleId,
 				name: match?.title?.rendered,
@@ -116,38 +118,42 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 
 	const blockProps = useBlockProps();
 
+	const handleRecordChange = useCallback(
+		(newRecord) => {
+			if (newRecord) {
+				const storyItemIds = newRecord?._story_item_ids;
+				setPostIds(storyItemIds);
+			}
+		},
+		[setPostIds]
+	);
+
 	const isInSetup = useMemo(() => {
-		console.log(
-			'isInSetup',
-			blockModuleId,
-			ref,
-			blockAreaSlug,
-			taxonomyName,
-			taxonomyTermSlug,
-			attributes
-		);
 		if (null !== blockModuleId && ref) {
 			return false;
 		}
 		if (!blockAreaSlug) {
 			return true;
 		}
+		if (blockAreaQueryComplete === true) {
+			return false;
+		}
+		if (blockAreaQueryComplete === false) {
+			return true;
+		}
 		return false;
-	}, [hasResolved, blockModuleId, blockAreaSlug, taxonomyTermSlug, ref]);
+	}, [blockModuleId, blockAreaSlug, ref, blockAreaQueryComplete]);
 
 	if (isInSetup) {
 		return (
 			<div {...blockProps}>
 				<BlockAreaWizard
-					{...{
-						attributes,
-						setAttributes,
-						blockModules,
-						isResolving,
-						clientId,
-						context,
-						isTaxonomyTemplate,
-					}}
+					attributes={attributes}
+					setAttributes={setAttributes}
+					blockModules={blockModules}
+					isResolving={isResolving}
+					clientId={clientId}
+					context={context}
 				/>
 			</div>
 		);
@@ -162,7 +168,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 				blockProps,
 				clientId,
 				allowDetach: true,
-				isMissingChildren: () => (
+				renderMissing: () => (
 					<BlockModuleCreate
 						{...{
 							blockAreaId,
@@ -172,26 +178,17 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 						}}
 					/>
 				),
-				collector: (newRecord) => {
-					// The collector prop runs after all records have been fetched and can be used to pass data back up to the parent component or for this example post meta back up into the editor global data-store.
-					if (newRecord) {
-						const storyItemIds = newRecord?._story_item_ids;
-						setPostIds(storyItemIds);
-					}
-				},
+				onRecordChange: handleRecordChange,
 			}}
 		>
 			<InspectorControls
-				{...{
-					attributes,
-					setAttributes,
-					clientId,
-					blockArea,
-					taxonomy,
-					blockModule,
-					postStatus,
-					setPostStatus,
-				}}
+				attributes={attributes}
+				setAttributes={setAttributes}
+				blockArea={blockArea}
+				taxonomy={taxonomy}
+				blockModule={blockModule}
+				postStatus={postStatus}
+				setPostStatus={setPostStatus}
 			/>
 		</InnerBlocksAsSyncedContent>
 	);

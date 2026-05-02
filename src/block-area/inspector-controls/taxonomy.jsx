@@ -52,7 +52,6 @@ export default function TaxonomyControl({
 				<TermSelect
 					{...{
 						onChange: (value) => {
-							console.log('onChange...', value);
 							// if empty set term slug to empty as well
 							if (!value) {
 								setAttributes({ taxonomyTermSlug: null });

@@ -27,6 +27,34 @@
 		},
 		"inheritTermFromTemplate": {
 			"type": "boolean"
+		},
+		"blockAreaQueryComplete": {
+			"type": "boolean"
+		},
+		"wizardStep": {
+			"type": "string",
+			"role": "local",
+			"default": "intro"
+		},
+		"wizardNewBlockAreaName": {
+			"type": "string",
+			"role": "local",
+			"default": ""
+		},
+		"wizardAllowTaxonomySelection": {
+			"type": "boolean",
+			"role": "local",
+			"default": false
+		},
+		"wizardIsCreatingNewBlockArea": {
+			"type": "boolean",
+			"role": "local",
+			"default": false
+		},
+		"wizardQueryCPhase": {
+			"type": "string",
+			"role": "local",
+			"default": "review"
 		}
 	},
 	"example": {

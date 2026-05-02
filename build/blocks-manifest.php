@@ -30,6 +30,34 @@ return array(
 			),
 			'inheritTermFromTemplate' => array(
 				'type' => 'boolean'
+			),
+			'blockAreaQueryComplete' => array(
+				'type' => 'boolean'
+			),
+			'wizardStep' => array(
+				'type' => 'string',
+				'role' => 'local',
+				'default' => 'intro'
+			),
+			'wizardNewBlockAreaName' => array(
+				'type' => 'string',
+				'role' => 'local',
+				'default' => ''
+			),
+			'wizardAllowTaxonomySelection' => array(
+				'type' => 'boolean',
+				'role' => 'local',
+				'default' => false
+			),
+			'wizardIsCreatingNewBlockArea' => array(
+				'type' => 'boolean',
+				'role' => 'local',
+				'default' => false
+			),
+			'wizardQueryCPhase' => array(
+				'type' => 'string',
+				'role' => 'local',
+				'default' => 'review'
 			)
 		),
 		'example' => array(

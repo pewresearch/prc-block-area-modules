@@ -2,11 +2,25 @@
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Spinner } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 import Step from './_step';
 
-export default function Intro({ isResolving, blockModules = [], setNextStep }) {
+/**
+ * @param {Object}   props
+ * @param {boolean}  props.isResolving
+ * @param {Array}    props.blockModules
+ * @param {Function} props.setAttributes
+ */
+export default function Intro({
+	isResolving,
+	blockModules = [],
+	setAttributes,
+}) {
 	return (
 		<Step>
 			<p>
@@ -17,30 +31,32 @@ export default function Intro({ isResolving, blockModules = [], setNextStep }) {
 			</p>
 			{isResolving && <Spinner />}
 			{!isResolving && (
-				<Button
-					variant="primary"
-					onClick={() => setNextStep('query-a')}
-				>
-					{__('Configure Block Area')}
-				</Button>
-			)}
-
-			{!isResolving && !!blockModules.length && (
-				<Button
-					variant="secondary"
-					onClick={() => setNextStep('select-a')}
-				>
-					{__('Choose Existing Module')}
-				</Button>
-			)}
-
-			{!isResolving && (
-				<Button
-					variant="secondary"
-					onClick={() => setNextStep('create-a')}
-				>
-					{__('Start New Module')}
-				</Button>
+				<HStack spacing="3" wrap style={{ maxWidth: 'fit-content' }}>
+					<Button
+						variant="primary"
+						onClick={() => setAttributes({ wizardStep: 'query-a' })}
+					>
+						{__('Configure Block Area')}
+					</Button>
+					{!!blockModules.length && (
+						<Button
+							variant="secondary"
+							onClick={() =>
+								setAttributes({ wizardStep: 'select-a' })
+							}
+						>
+							{__('Choose Existing Module')}
+						</Button>
+					)}
+					<Button
+						variant="secondary"
+						onClick={() =>
+							setAttributes({ wizardStep: 'create-a' })
+						}
+					>
+						{__('Start New Module')}
+					</Button>
+				</HStack>
 			)}
 		</Step>
 	);

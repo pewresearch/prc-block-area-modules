@@ -9,6 +9,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { TextControl, FlexBlock } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal Dependencies
@@ -48,7 +49,7 @@ export default function BlockModuleControl({
 				<TextControl
 					__nextHasNoMarginBottom
 					label={`${POST_TYPE_LABEL} Title`}
-					value={blockModuleTitle}
+					value={decodeEntities(blockModuleTitle)}
 					onChange={setBlockModuleTitle}
 				/>
 			</FlexBlock>

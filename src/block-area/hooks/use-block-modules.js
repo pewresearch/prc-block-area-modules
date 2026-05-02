@@ -59,9 +59,7 @@ export default function useBlockModules({
 		queryArgs.include = [ref];
 	}
 
-	console.log('postStatus', queryArgs, {taxonomyName, taxonomyTermId, blockAreaId});
-
-	const { hasResolved, isResolving, records, status } = useEntityRecords(
+	const { hasResolved, isResolving, records } = useEntityRecords(
 		'postType',
 		POST_TYPE_REST_BASE,
 		{ ...queryArgs, ...args },

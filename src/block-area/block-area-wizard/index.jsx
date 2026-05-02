@@ -2,27 +2,45 @@
 /**
  * WordPress Dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Placeholder } from '@wordpress/components';
+import {
+	Button,
+	Placeholder,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import { Intro, QueryA, QueryB, QueryC, SelectA, CreateA } from './steps';
 import Icon from '../icon';
+import { createBlockArea } from '../functions';
 
-const STEPS = [
-	'intro', // Choose "Query by Block Area", "Select Specific Block Module", or "Create New Module"
-	'query-a', // We enter the query block area setup, first we either select or create a new block area slug.
-	'query-b', // We either select the category slug, select inheirt category, or no category and thus we'd just pick whatever is most recent in the block area.
-	'query-c', // We review the settings and then click finish.
-	'create-a', // We enter the block module setup, we can give it a title and select whether it should publish immediately or at a future date (draft).
-	'create-b', // We enter the block area setup, first we either select or create a new block area slug or we determine we don't want a block area, we explain that means we will only pull in this block module and then we set the ref.
-	'create-c', // We review the settings and then click finish.
-	'select-a', // We open a modal with the templateparts like selector. There is no revie stage here, we immediately set the ref and load the block module.
-];
+const WIZARD_RESET = {
+	wizardStep: 'intro',
+	wizardNewBlockAreaName: '',
+	wizardAllowTaxonomySelection: false,
+	wizardIsCreatingNewBlockArea: false,
+	wizardQueryCPhase: 'review',
+};
 
+const PREVIOUS_STEP = {
+	'query-a': 'intro',
+	'query-b': 'query-a',
+	'query-c': 'query-b',
+	'select-a': 'intro',
+};
+
+/**
+ * @param {Object}   props
+ * @param {Object}   props.attributes
+ * @param {Function} props.setAttributes
+ * @param {Array}    props.blockModules
+ * @param {boolean}  props.isResolving
+ * @param {Object}   props.context
+ * @param {string}   props.clientId
+ */
 export default function BlockAreaWizard({
 	attributes,
 	setAttributes,
@@ -32,55 +50,195 @@ export default function BlockAreaWizard({
 	clientId,
 }) {
 	const { templateSlug } = context;
-	const [blockAreaSlug, setBlockAreaSlug] = useState(
-		attributes?.blockAreaSlug
-	);
-	const [taxonomyName, setTaxonomyName] = useState(attributes?.taxonomyName);
-	const [taxonomyTermSlug, setTaxonomyTermSlug] = useState(
-		attributes?.taxonomyTermSlug
-	);
-	const [inheritTermFromTemplate, setInheritTermFromTemplate] = useState(
+
+	const blockAreaSlug = attributes?.blockAreaSlug ?? '';
+	const taxonomyName = attributes?.taxonomyName ?? '';
+	const taxonomyTermSlug = attributes?.taxonomyTermSlug ?? '';
+	const inheritTermFromTemplate = Boolean(
 		attributes?.inheritTermFromTemplate
 	);
-	const [allowTaxonomySelection, setAllowTaxonomySelection] = useState(false);
-	const toggleAllowTaxonomySelection = () => {
-		setAllowTaxonomySelection(!allowTaxonomySelection);
-	};
 
-	const [activeStep, setActiveStep] = useState('intro');
-	const setNextStep = (nextStep) => {
-		setActiveStep(nextStep);
-	};
-	const [buttonState, setButtonState] = useState({
-		variant: 'secondary',
-		isLoading: false,
-		text: 'Next',
-		onClick: null,
-		disabled: false,
-	});
+	const wizardStep = attributes?.wizardStep ?? 'intro';
+	const wizardNewBlockAreaName = attributes?.wizardNewBlockAreaName ?? '';
+	const wizardAllowTaxonomySelection = Boolean(
+		attributes?.wizardAllowTaxonomySelection
+	);
+	const wizardIsCreatingNewBlockArea = Boolean(
+		attributes?.wizardIsCreatingNewBlockArea
+	);
+	const wizardQueryCPhase = attributes?.wizardQueryCPhase ?? 'review';
 
-	const [newBlockAreaName, setNewBlockAreaName] = useState(false);
+	const setBlockAreaSlug = useCallback(
+		(value) => {
+			setAttributes({
+				blockAreaSlug: value,
+				blockAreaQueryComplete: false,
+			});
+		},
+		[setAttributes]
+	);
 
-	const allowPrevious = useMemo(() => {
-		switch (activeStep) {
-			case 'intro':
-				return null;
-			case 'query-a':
-				return true;
-			case 'query-b':
-				return true;
-			case 'query-c':
-				return true;
-			case 'create-a':
-				return true;
-			case 'create-b':
-				return true;
-			case 'select-a':
-				return true;
-			default:
-				return true;
+	const setTaxonomyTermSlug = useCallback(
+		(value) => {
+			setAttributes({ taxonomyTermSlug: value });
+		},
+		[setAttributes]
+	);
+
+	const setInheritTermFromTemplate = useCallback(
+		(value) => {
+			setAttributes({ inheritTermFromTemplate: value });
+		},
+		[setAttributes]
+	);
+
+	const isTaxonomyTemplate = useMemo(() => {
+		return (
+			undefined !== templateSlug &&
+			!!taxonomyName &&
+			templateSlug.includes(`${taxonomyName}-`)
+		);
+	}, [templateSlug, taxonomyName]);
+
+	const canProceedQueryA = useMemo(() => {
+		if (wizardIsCreatingNewBlockArea) {
+			return wizardNewBlockAreaName.trim().length >= 3;
 		}
-	}, [activeStep]);
+		return Boolean(blockAreaSlug && blockAreaSlug.length > 0);
+	}, [wizardIsCreatingNewBlockArea, wizardNewBlockAreaName, blockAreaSlug]);
+
+	const canProceedQueryB = useMemo(() => {
+		if (!wizardAllowTaxonomySelection) {
+			return true;
+		}
+		if (inheritTermFromTemplate && isTaxonomyTemplate) {
+			return true;
+		}
+		return Boolean(taxonomyTermSlug && taxonomyTermSlug.length > 0);
+	}, [
+		wizardAllowTaxonomySelection,
+		inheritTermFromTemplate,
+		isTaxonomyTemplate,
+		taxonomyTermSlug,
+	]);
+
+	const handleQueryCInsert = useCallback(async () => {
+		const newAttrs = {
+			inheritTermFromTemplate,
+			blockAreaQueryComplete: true,
+			...WIZARD_RESET,
+		};
+		if (taxonomyTermSlug) {
+			newAttrs.taxonomyTermSlug = taxonomyTermSlug;
+		}
+		if (wizardNewBlockAreaName.trim()) {
+			const newBlockAreaSlug = await createBlockArea(
+				wizardNewBlockAreaName.trim()
+			);
+			if (newBlockAreaSlug) {
+				newAttrs.blockAreaSlug = newBlockAreaSlug;
+				setAttributes(newAttrs);
+			}
+			return;
+		}
+		if (blockAreaSlug) {
+			newAttrs.blockAreaSlug = blockAreaSlug;
+			setAttributes(newAttrs);
+		}
+	}, [
+		inheritTermFromTemplate,
+		taxonomyTermSlug,
+		wizardNewBlockAreaName,
+		blockAreaSlug,
+		setAttributes,
+	]);
+
+	const primaryToolbar = useMemo(() => {
+		if (wizardStep === 'select-a') {
+			return null;
+		}
+		if (wizardStep === 'query-a') {
+			return {
+				text: __('Next', 'prc-platform-core'),
+				variant: 'secondary',
+				disabled: !canProceedQueryA,
+				onClick: () => {
+					setAttributes({
+						wizardStep: 'query-b',
+					});
+				},
+			};
+		}
+		if (wizardStep === 'query-b') {
+			return {
+				text: __('Next', 'prc-platform-core'),
+				variant: 'secondary',
+				disabled: !canProceedQueryB,
+				onClick: () => {
+					setAttributes({
+						wizardStep: 'query-c',
+						wizardQueryCPhase: 'review',
+					});
+				},
+			};
+		}
+		if (wizardStep === 'query-c') {
+			if (wizardQueryCPhase === 'review') {
+				return {
+					text: __('Confirm Settings', 'prc-platform-core'),
+					variant: 'secondary',
+					disabled: false,
+					onClick: () => {
+						setAttributes({ wizardQueryCPhase: 'confirm' });
+					},
+				};
+			}
+			return {
+				text: __('Insert Block Area', 'prc-platform-core'),
+				variant: 'primary',
+				disabled: false,
+				onClick: () => {
+					void handleQueryCInsert();
+				},
+			};
+		}
+		return null;
+	}, [
+		wizardStep,
+		wizardQueryCPhase,
+		canProceedQueryA,
+		canProceedQueryB,
+		setAttributes,
+		handleQueryCInsert,
+	]);
+
+	const handleBack = useCallback(() => {
+		const prev = PREVIOUS_STEP[wizardStep];
+		if (!prev) {
+			return;
+		}
+		const patch = { wizardStep: prev };
+		if (wizardStep === 'query-c') {
+			patch.wizardQueryCPhase = 'review';
+		}
+		if (prev === 'intro') {
+			Object.assign(patch, {
+				wizardIsCreatingNewBlockArea: false,
+				wizardNewBlockAreaName: '',
+			});
+		}
+		setAttributes(patch);
+	}, [wizardStep, setAttributes]);
+
+	const showToolbar = ['query-a', 'query-b', 'query-c', 'select-a'].includes(
+		wizardStep
+	);
+
+	const allowBack =
+		wizardStep === 'select-a' ||
+		(wizardStep !== 'intro' &&
+			wizardStep !== 'create-a' &&
+			Boolean(PREVIOUS_STEP[wizardStep]));
 
 	return (
 		<Placeholder
@@ -89,135 +247,94 @@ export default function BlockAreaWizard({
 			icon={() => <Icon color={null} />}
 		>
 			<div className="block-area-edit__placeholder-inner">
-				{['intro', 'create-a'].includes(activeStep) && (
+				{['intro', 'create-a'].includes(wizardStep) && (
 					<Intro
-						{...{
-							isResolving,
-							blockModules,
-							buttonState,
-							setButtonState,
-							setNextStep,
-							isResolving,
-						}}
+						isResolving={isResolving}
+						blockModules={blockModules}
+						setAttributes={setAttributes}
 					/>
 				)}
-				{activeStep === 'query-a' && (
+				{wizardStep === 'query-a' && (
 					<QueryA
-						{...{
-							blockAreaSlug,
-							setBlockAreaSlug,
-							newBlockAreaName,
-							setNewBlockAreaName,
-							setNextStep,
-							buttonState,
-							setButtonState,
-						}}
+						blockAreaSlug={blockAreaSlug}
+						setBlockAreaSlug={setBlockAreaSlug}
+						wizardNewBlockAreaName={wizardNewBlockAreaName}
+						wizardIsCreatingNewBlockArea={
+							wizardIsCreatingNewBlockArea
+						}
+						setAttributes={setAttributes}
 					/>
 				)}
-				{activeStep === 'query-b' && (
+				{wizardStep === 'query-b' && (
 					<QueryB
-						{...{
-							taxonomyName,
-							setTaxonomyName,
-							taxonomyTermSlug,
-							setTaxonomyTermSlug,
-							templateSlug,
-							allowTaxonomySelection,
-							inheritTermFromTemplate,
-							toggleAllowTaxonomySelection,
-							setInheritTermFromTemplate,
-							buttonState,
-							setButtonState,
-							setNextStep,
-						}}
+						taxonomyName={taxonomyName}
+						taxonomyTermSlug={taxonomyTermSlug}
+						setTaxonomyTermSlug={setTaxonomyTermSlug}
+						templateSlug={templateSlug}
+						allowTaxonomySelection={wizardAllowTaxonomySelection}
+						inheritTermFromTemplate={inheritTermFromTemplate}
+						setInheritTermFromTemplate={setInheritTermFromTemplate}
+						setAttributes={setAttributes}
+						isTaxonomyTemplate={isTaxonomyTemplate}
 					/>
 				)}
-				{activeStep === 'query-c' && (
+				{wizardStep === 'query-c' && (
 					<QueryC
-						{...{
-							blockAreaSlug,
-							taxonomyName,
-							taxonomyTermSlug,
-							inheritTermFromTemplate,
-							newBlockAreaName,
-							setAttributes,
-							setNextStep,
-							buttonState,
-							setButtonState,
-						}}
+						blockAreaSlug={blockAreaSlug}
+						taxonomyName={taxonomyName}
+						taxonomyTermSlug={taxonomyTermSlug}
+						inheritTermFromTemplate={inheritTermFromTemplate}
+						newBlockAreaName={wizardNewBlockAreaName}
 					/>
 				)}
-				{activeStep === 'select-a' && (
+				{wizardStep === 'select-a' && (
 					<SelectA
-						{...{
-							clientId,
-							onSelect: ({ id }) => {
-								setAttributes({
-									ref: id,
-								});
-							},
-							onClose: () => {
-								setNextStep('intro');
-							},
+						clientId={clientId}
+						onSelect={({ id }) => {
+							setAttributes({
+								ref: id,
+								blockAreaQueryComplete: true,
+								...WIZARD_RESET,
+							});
+						}}
+						onClose={() => {
+							setAttributes({ wizardStep: 'intro' });
 						}}
 					/>
 				)}
-				{activeStep === 'create-a' && (
+				{wizardStep === 'create-a' && (
 					<CreateA
-						{...{
-							onCreate: (id) => {
-								setAttributes({
-									ref: id,
-								});
-							},
-							setNextStep,
+						onCreate={(id) => {
+							setAttributes({
+								ref: id,
+								blockAreaQueryComplete: true,
+								...WIZARD_RESET,
+							});
 						}}
+						setAttributes={setAttributes}
 					/>
 				)}
-				{!['intro', 'create-a'].includes(activeStep) && (
-					<div className="block-area-edit__toolbar">
-						{null !== allowPrevious && (
-							<Button
-								variant="secondary"
-								disabled={!allowPrevious}
-								onClick={() => {
-									if (null !== allowPrevious) {
-										// if activeStep is query-a we're going back to intro, if its query-b we're going back to query-a, if its query-c we're going back to query-b.
-										// if activestep is create-a we're going back to intro, if its create-b we're going back to create-a.
-										// if activeStep is select-a we're going back to intro.
-										if ('intro' === activeStep) {
-											setActiveStep('intro');
-										} else if ('query-a' === activeStep) {
-											setActiveStep('intro');
-										} else if ('query-b' === activeStep) {
-											setActiveStep('query-a');
-										} else if ('query-c' === activeStep) {
-											setActiveStep('query-b');
-										} else if ('create-a' === activeStep) {
-											setActiveStep('intro');
-										} else if ('create-b' === activeStep) {
-											setActiveStep('create-a');
-										} else if ('select-a' === activeStep) {
-											setActiveStep('intro');
-										}
-									}
-								}}
-							>
-								Back
+				{showToolbar && (
+					<HStack
+						className="block-area-edit__toolbar"
+						spacing="2"
+						style={{ maxWidth: 'fit-content' }}
+					>
+						{allowBack && (
+							<Button variant="link" onClick={handleBack}>
+								{__('Back', 'prc-platform-core')}
 							</Button>
 						)}
-						<Button
-							variant={buttonState.variant}
-							disabled={buttonState.disabled}
-							onClick={() => {
-								if (null !== buttonState.onClick) {
-									buttonState.onClick();
-								}
-							}}
-						>
-							{buttonState.text}
-						</Button>
-					</div>
+						{wizardStep !== 'select-a' && primaryToolbar && (
+							<Button
+								variant={primaryToolbar.variant}
+								disabled={primaryToolbar.disabled}
+								onClick={primaryToolbar.onClick}
+							>
+								{primaryToolbar.text}
+							</Button>
+						)}
+					</HStack>
 				)}
 			</div>
 		</Placeholder>
