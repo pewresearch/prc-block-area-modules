@@ -28,7 +28,7 @@ built modules 115 KiB (javascript) 1.52 KiB (css/mini-extract) [1m[33m[built]
   cacheable modules 1.52 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/editor.scss[39m[22m 1.46 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/style.scss[39m[22m 67 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 12407 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 10335 ms
 
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 178 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 172 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
