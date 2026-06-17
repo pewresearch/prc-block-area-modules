@@ -2,33 +2,33 @@
 > @prc/block-area-modules@1.0.0 build
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
-assets by path block-area/ 49.2 KiB
+assets by path [1m[32mblock-area/[39m[22m 49.2 KiB
   assets by chunk 43.5 KiB (name: block-area/index)
-    assets by path block-area/*.css 2.91 KiB 2 assets
+    assets by path [1m[32mblock-area/*.css[39m[22m 2.91 KiB 2 assets
     + 2 assets
   assets by chunk 136 bytes (name: block-area/style-index)
-    asset block-area/style-index-rtl.css 68 bytes [emitted] (name: block-area/style-index) (id hint: style)
-    asset block-area/style-index.css 68 bytes [emitted] (name: block-area/style-index) (id hint: style)
-  asset block-area/class-block-area.php 3.8 KiB [emitted] [from: src/block-area/class-block-area.php] [copied]
-  asset block-area/block.json 1.77 KiB [emitted] [from: src/block-area/block.json] [copied]
-assets by path block-area-context-provider/ 12.2 KiB
-  assets by path block-area-context-provider/*.php 9.59 KiB
-    asset block-area-context-provider/class-block-area-context-provider.php 9.42 KiB [emitted] [from: src/block-area-context-provider/class-block-area-context-provider.php] [copied]
-    asset block-area-context-provider/index.asset.php 177 bytes [emitted] (name: block-area-context-provider/index)
-  asset block-area-context-provider/index.js 1.87 KiB [emitted] [minimized] (name: block-area-context-provider/index)
-  asset block-area-context-provider/block.json 739 bytes [emitted] [from: src/block-area-context-provider/block.json] [copied]
-Entrypoint block-area/index 43.6 KiB = 6 assets
-Entrypoint block-area-context-provider/index 2.04 KiB = block-area-context-provider/index.js 1.87 KiB block-area-context-provider/index.asset.php 177 bytes
-orphan modules 345 KiB (javascript) 1.83 KiB (runtime) [orphan] 400 modules
+    asset [1m[32mblock-area/style-index-rtl.css[39m[22m 68 bytes [1m[32m[emitted][39m[22m (name: block-area/style-index) (id hint: style)
+    asset [1m[32mblock-area/style-index.css[39m[22m 68 bytes [1m[32m[emitted][39m[22m (name: block-area/style-index) (id hint: style)
+  asset [1m[32mblock-area/class-block-area.php[39m[22m 3.8 KiB [1m[32m[emitted][39m[22m [from: src/block-area/class-block-area.php] [1m[32m[copied][39m[22m
+  asset [1m[32mblock-area/block.json[39m[22m 1.77 KiB [1m[32m[emitted][39m[22m [from: src/block-area/block.json] [1m[32m[copied][39m[22m
+assets by path [1m[32mblock-area-context-provider/[39m[22m 12.2 KiB
+  assets by path [1m[32mblock-area-context-provider/*.php[39m[22m 9.59 KiB
+    asset [1m[32mblock-area-context-provider/class-block-area-context-provider.php[39m[22m 9.42 KiB [1m[32m[emitted][39m[22m [from: src/block-area-context-provider/class-block-area-context-provider.php] [1m[32m[copied][39m[22m
+    asset [1m[32mblock-area-context-provider/index.asset.php[39m[22m 177 bytes [1m[32m[emitted][39m[22m (name: block-area-context-provider/index)
+  asset [1m[32mblock-area-context-provider/index.js[39m[22m 1.87 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: block-area-context-provider/index)
+  asset [1m[32mblock-area-context-provider/block.json[39m[22m 739 bytes [1m[32m[emitted][39m[22m [from: src/block-area-context-provider/block.json] [1m[32m[copied][39m[22m
+Entrypoint [1mblock-area/index[39m[22m 43.6 KiB = 6 assets
+Entrypoint [1mblock-area-context-provider/index[39m[22m 2.04 KiB = [1m[32mblock-area-context-provider/index.js[39m[22m 1.87 KiB [1m[32mblock-area-context-provider/index.asset.php[39m[22m 177 bytes
+orphan modules 345 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 400 modules
 runtime modules 2.52 KiB 3 modules
-built modules 115 KiB (javascript) 1.52 KiB (css/mini-extract) [built]
+built modules 115 KiB (javascript) 1.52 KiB (css/mini-extract) [1m[33m[built][39m[22m
   javascript modules 115 KiB
-    ./src/block-area/index.js + 61 modules 110 KiB [not cacheable] [built] [code generated]
-    ./src/block-area-context-provider/index.js + 13 modules 5.2 KiB [not cacheable] [built] [code generated]
+    [1m./src/block-area/index.js + 61 modules[39m[22m 110 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/block-area-context-provider/index.js + 13 modules[39m[22m 5.2 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   cacheable modules 1.52 KiB
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/block-area/editor.scss 1.46 KiB [built] [code generated]
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/block-area/style.scss 67 bytes [built] [code generated]
-webpack 5.106.2 compiled successfully in 6194 ms
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/editor.scss[39m[22m 1.46 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/style.scss[39m[22m 67 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 19892 ms
 
-webpack 5.106.2 compiled successfully in 127 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 255 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
