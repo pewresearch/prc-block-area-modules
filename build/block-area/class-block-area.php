@@ -9,9 +9,8 @@
 namespace PRC\Platform\Block_Area_Modules;
 
 use WP_Error;
-use WP_Query;
-use WP_Term;
 use WP_Post;
+use WP_Term;
 
 /**
  * Block Area class for managing block area.
@@ -97,17 +96,14 @@ class Block_Area {
 			$reference_id
 		);
 
-		$block_modules = new WP_Query( $query_args );
-		if ( $block_modules->have_posts() ) {
-			$block_module_id = $block_modules->posts[0];
-			$block_module    = get_post( $block_module_id );
-			$content         = $block_module instanceof WP_Post ? apply_filters(
+		$block_module_id = Block_Area_Context_Provider::get_block_module_id( $query_args );
+		if ( false !== $block_module_id ) {
+			$block_module = get_post( $block_module_id );
+			$content      = $block_module instanceof WP_Post ? apply_filters(
 				'the_content',
 				$block_module->post_content,
 			) : $content;
 		}
-
-		wp_reset_postdata();
 
 		$id = wp_unique_id( 'prc-platform-block-area-' );
 

@@ -42,6 +42,20 @@ class Block_Area_Context_Provider {
 	public static $cache_key = 'prc_block_area_module_story_item_ids';
 
 	/**
+	 * Cache group for resolved block module post IDs.
+	 *
+	 * @var string
+	 */
+	public static $module_id_cache_key = 'prc_block_area_module_id';
+
+	/**
+	 * Cache TTL for block module lookups.
+	 *
+	 * @var int
+	 */
+	public const MODULE_CACHE_TTL = HOUR_IN_SECONDS;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @param object $loader The loader object.
@@ -311,6 +325,54 @@ class Block_Area_Context_Provider {
 	public static function get_cache_id( $block_area_slug, $category_slug ) {
 		$to_return = md5( wp_json_encode( array( $block_area_slug, $category_slug ) ) );
 		return $to_return;
+	}
+
+	/**
+	 * Cache id for a block module WP_Query lookup.
+	 *
+	 * @param array|false $query_args Query arguments from get_query_args().
+	 * @return string|false
+	 */
+	public static function get_module_cache_id( $query_args ) {
+		if ( false === $query_args || ! is_array( $query_args ) ) {
+			return false;
+		}
+		return md5( wp_json_encode( $query_args ) );
+	}
+
+	/**
+	 * Resolve a block module post ID for the given query args, with object cache.
+	 *
+	 * @param array|false $query_args Query arguments from get_query_args().
+	 * @return int|false
+	 */
+	public static function get_block_module_id( $query_args ) {
+		if ( false === $query_args || ! is_array( $query_args ) ) {
+			return false;
+		}
+
+		$cache_id  = self::get_module_cache_id( $query_args );
+		$use_cache = ! is_preview() && false !== $cache_id;
+
+		if ( $use_cache ) {
+			$cached = wp_cache_get( $cache_id, self::$module_id_cache_key );
+			if ( false !== $cached ) {
+				return $cached ? (int) $cached : false;
+			}
+		}
+
+		$block_modules = new \WP_Query( $query_args );
+		$module_id     = false;
+		if ( $block_modules->have_posts() ) {
+			$module_id = (int) $block_modules->posts[0];
+		}
+		wp_reset_postdata();
+
+		if ( $use_cache ) {
+			wp_cache_set( $cache_id, $module_id ?: 0, self::$module_id_cache_key, self::MODULE_CACHE_TTL );
+		}
+
+		return $module_id ?: false;
 	}
 
 	/**

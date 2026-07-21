@@ -318,7 +318,12 @@ class Content_Type {
 		);
 		$block_area_slug = count( $block_areas ) > 0 ? $block_areas[0] : null;
 		$cache_id        = Block_Area_Context_Provider::get_cache_id( $block_area_slug, $category_slug );
+		$query_args      = Block_Area_Context_Provider::get_query_args( 'category', $category_slug, $block_area_slug );
+		$module_cache_id = Block_Area_Context_Provider::get_module_cache_id( $query_args );
 
-		return wp_cache_delete( $cache_id, Block_Area_Context_Provider::$cache_key );
+		wp_cache_delete( $cache_id, Block_Area_Context_Provider::$cache_key );
+		if ( false !== $module_cache_id ) {
+			wp_cache_delete( $module_cache_id, Block_Area_Context_Provider::$module_id_cache_key );
+		}
 	}
 }

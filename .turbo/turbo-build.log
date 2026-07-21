@@ -1,5 +1,5 @@
 
-> @prc/block-area-modules@1.0.0 build
+> @prc/block-area-modules@1.0.1 build
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
 assets by path block-area/ 28.9 KiB
@@ -9,11 +9,11 @@ assets by path block-area/ 28.9 KiB
   assets by chunk 136 bytes (name: block-area/style-index)
     asset block-area/style-index-rtl.css 68 bytes [compared for emit] (name: block-area/style-index) (id hint: style)
     asset block-area/style-index.css 68 bytes [compared for emit] (name: block-area/style-index) (id hint: style)
-  asset block-area/class-block-area.php 3.8 KiB [compared for emit] [from: src/block-area/class-block-area.php] [copied]
+  asset block-area/class-block-area.php 3.75 KiB [compared for emit] [from: src/block-area/class-block-area.php] [copied]
   asset block-area/block.json 1.77 KiB [compared for emit] [from: src/block-area/block.json] [copied]
-assets by path block-area-context-provider/ 12.2 KiB
-  assets by path block-area-context-provider/*.php 9.59 KiB
-    asset block-area-context-provider/class-block-area-context-provider.php 9.42 KiB [compared for emit] [from: src/block-area-context-provider/class-block-area-context-provider.php] [copied]
+assets by path block-area-context-provider/ 13.7 KiB
+  assets by path block-area-context-provider/*.php 11.1 KiB
+    asset block-area-context-provider/class-block-area-context-provider.php 11 KiB [compared for emit] [from: src/block-area-context-provider/class-block-area-context-provider.php] [copied]
     asset block-area-context-provider/index.asset.php 177 bytes [compared for emit] (name: block-area-context-provider/index)
   asset block-area-context-provider/index.js 1.87 KiB [compared for emit] [minimized] (name: block-area-context-provider/index)
   asset block-area-context-provider/block.json 739 bytes [compared for emit] [from: src/block-area-context-provider/block.json] [copied]
@@ -28,7 +28,7 @@ built modules 52.7 KiB (javascript) 1.52 KiB (css/mini-extract) [built]
   cacheable modules 1.52 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/block-area/editor.scss 1.46 KiB [built] [code generated]
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/block-area/style.scss 67 bytes [built] [code generated]
-webpack 5.106.2 compiled successfully in 4204 ms
+webpack 5.106.2 compiled successfully in 4236 ms
 
-webpack 5.106.2 compiled successfully in 64 ms
+webpack 5.106.2 compiled successfully in 58 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
