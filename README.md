@@ -1,5 +1,7 @@
 # PRC Block Area Modules
 
+> Canonical docs: [docs/plugins/prc-block-area-modules/](../../docs/plugins/prc-block-area-modules/)
+
 Provides an editorially curated system for populating named zones in a block theme with reusable block content. Rather than using static template parts, editors assign a `block_module` post (a freeform block-editor document) to a named `block_area` taxonomy term, optionally scoped by taxonomy (e.g., topic category or region). The correct module is resolved server-side at render time.
 
 ## What it does

@@ -73,6 +73,7 @@ class Plugin {
 
 		// Load files...
 		require_once plugin_dir_path( __DIR__ ) . '/includes/class-content-type.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/class-admin-dataview-lists.php';
 		require_once plugin_dir_path( __DIR__ ) . '/build/block-area-context-provider/class-block-area-context-provider.php';
 		require_once plugin_dir_path( __DIR__ ) . '/build/block-area/class-block-area.php';
 
@@ -93,6 +94,7 @@ class Plugin {
 
 		// Initialize the dependencies.
 		new Content_Type( $this->get_loader() );
+		new Admin_Dataview_Lists( $this->get_loader() );
 		new Block_Area_Context_Provider( $this->get_loader() );
 		new Block_Area( $this->get_loader() );
 	}
