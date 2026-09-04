@@ -167,7 +167,7 @@ class Content_Type {
 				'custom-fields',
 				'revisions',
 			),
-			'taxonomies'          => array( 'category', 'regions-countries', 'block_area', 'collection' ),
+			'taxonomies'          => array( 'category', 'regions-countries', 'block_area', 'collection', 'prc_newsletter_list' ),
 			'hierarchical'        => false,
 			'public'              => true,
 			'show_ui'             => true,

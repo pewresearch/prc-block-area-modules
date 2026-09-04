@@ -1,9 +1,9 @@
 
-> @prc/block-area-modules@1.0.1 build
+> @prc/block-area-modules@1.1.0 build
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
-assets by path [1m[32mblock-area/[39m[22m 28.9 KiB
-  assets by chunk 23.2 KiB (name: block-area/index)
+assets by path [1m[32mblock-area/[39m[22m 29.2 KiB
+  assets by chunk 23.5 KiB (name: block-area/index)
     assets by path [1m[32mblock-area/*.css[39m[22m 2.91 KiB 2 assets
     + 2 assets
   assets by chunk 136 bytes (name: block-area/style-index)
@@ -17,18 +17,18 @@ assets by path [1m[32mblock-area-context-provider/[39m[22m 13.7 KiB
     asset [1m[32mblock-area-context-provider/index.asset.php[39m[22m 177 bytes [1m[32m[emitted][39m[22m (name: block-area-context-provider/index)
   asset [1m[32mblock-area-context-provider/index.js[39m[22m 1.87 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: block-area-context-provider/index)
   asset [1m[32mblock-area-context-provider/block.json[39m[22m 739 bytes [1m[32m[emitted][39m[22m [from: src/block-area-context-provider/block.json] [1m[32m[copied][39m[22m
-Entrypoint [1mblock-area/index[39m[22m 23.4 KiB = 6 assets
+Entrypoint [1mblock-area/index[39m[22m 23.7 KiB = 6 assets
 Entrypoint [1mblock-area-context-provider/index[39m[22m 2.04 KiB = [1m[32mblock-area-context-provider/index.js[39m[22m 1.87 KiB [1m[32mblock-area-context-provider/index.asset.php[39m[22m 177 bytes
-orphan modules 263 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 373 modules
+orphan modules 264 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 373 modules
 runtime modules 3.08 KiB 5 modules
-built modules 52.7 KiB (javascript) 1.52 KiB (css/mini-extract) [1m[33m[built][39m[22m
-  javascript modules 52.7 KiB
-    [1m./src/block-area/index.js + 42 modules[39m[22m 47.5 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+built modules 53 KiB (javascript) 1.52 KiB (css/mini-extract) [1m[33m[built][39m[22m
+  javascript modules 53 KiB
+    [1m./src/block-area/index.js + 42 modules[39m[22m 47.8 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     [1m./src/block-area-context-provider/index.js + 13 modules[39m[22m 5.2 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   cacheable modules 1.52 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/editor.scss[39m[22m 1.46 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/block-area/style.scss[39m[22m 67 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 19281 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1965 ms
 
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 168 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 15 ms
 Block metadata PHP file generated at: build/blocks-manifest.php

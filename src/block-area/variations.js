@@ -36,4 +36,13 @@ export default [
 		isActive: (blockAttributes, variationAttributes) =>
 			variationAttributes.taxonomyName === blockAttributes.taxonomyName,
 	},
+	{
+		name: 'newsletter-list-block-area',
+		title: __('Newsletter List Block Area'),
+		description: __('This block area queries by newsletter list taxonomy.'),
+		attributes: { taxonomyName: 'prc_newsletter_list' },
+		scope: ['inserter', 'transform'],
+		isActive: (blockAttributes, variationAttributes) =>
+			variationAttributes.taxonomyName === blockAttributes.taxonomyName,
+	},
 ];

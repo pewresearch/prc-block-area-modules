@@ -14,7 +14,7 @@ Provides an editorially curated system for populating named zones in a block the
 - On `pre_get_posts`, automatically excludes `topic-lede` story items from the main query on category archives.
 - Caches resolved `_story_item_ids` per block-area/category combination (1 hour TTL, object cache). Cache is busted on `block_module` save.
 - Stores an indexed list of `prc-block/story-item` post IDs (`_story_item_ids` meta) on each `block_module` at save time.
-- Ships three block variations: `Topic Block Area` (by `category`), `Regions Countries Block Area` (by `regions-countries`), and `Collections Block Area` (by `collection`).
+- Ships four block variations: `Topic Block Area` (by `category`), `Regions Countries Block Area` (by `regions-countries`), `Collections Block Area` (by `collection`), and `Newsletter List Block Area` (by `prc_newsletter_list`).
 - Block area editor UI includes a setup wizard (for first-time configuration) and an `InnerBlocksAsSyncedContent` view of the resolved module with inspector controls for re-pointing the area.
 - Non-menu block areas are suppressed on paged requests (`is_paged()`). The Interactivity API store (`prc-platform/block-area`) mirrors this behavior on the frontend.
 
@@ -28,7 +28,7 @@ Provides an editorially curated system for populating named zones in a block the
 | `src/block-area/block.json` | Block metadata for `prc-platform/block-area` (attributes, supports, usesContext) |
 | `src/block-area/class-block-area.php` | Server render callback; resolves matching `block_module` via `WP_Query`, outputs Interactivity API wrapper |
 | `src/block-area/edit.jsx` | Editor UI — setup wizard on first use, `InnerBlocksAsSyncedContent` once a module is linked |
-| `src/block-area/variations.js` | Three block variations scoped by taxonomy (category, regions-countries, collection) |
+| `src/block-area/variations.js` | Four block variations scoped by taxonomy (category, regions-countries, collection, prc_newsletter_list) |
 | `src/block-area/view.js` | Interactivity API store — hides non-menu block areas on paged requests |
 | `src/block-area-context-provider/class-block-area-context-provider.php` | Collects story item IDs from block modules, injects into query block context and main query |
 | `src/block-area-context-provider/block.json` | Block metadata for `prc-platform/block-area-context-provider` |
@@ -53,7 +53,7 @@ Provides an editorially curated system for populating named zones in a block the
 ```
 block_module (post type)
   └── block_area (taxonomy)          – which zone this module fills
-  └── category / regions-countries / collection (taxonomies) – optional scoping term
+  └── category / regions-countries / collection / prc_newsletter_list (taxonomies) – optional scoping term
   └── _story_item_ids (post meta)    – indexed array of prc-block/story-item postIds
 ```
 
@@ -65,7 +65,7 @@ A `prc-platform/block-area` block resolves to the single `block_module` post tha
 
 ## Usage notes
 
-- **Template usage**: Place `prc-platform/block-area` in a block theme template. Set `blockAreaSlug` to the zone name (e.g., `topic-lede`), `taxonomyName` to `category`, and enable `inheritTermFromTemplate` so the block resolves automatically per category archive.
+- **Template usage**: Place `prc-platform/block-area` in a block theme template. Set `blockAreaSlug` to the zone name (e.g., `topic-lede`), `taxonomyName` to `category`, `regions-countries`, `collection`, or `prc_newsletter_list`, and enable `inheritTermFromTemplate` so the block resolves automatically per archive term.
 - **Repetition prevention**: Wrap block areas and downstream query blocks inside `prc-platform/block-area-context-provider`. The provider ensures posts already displayed in a module's story items are excluded from sibling query loops.
 - **Cache invalidation**: Object cache entries are keyed by `md5(json([blockAreaSlug, categorySlug]))` under the `prc_block_area_module_story_item_ids` group. Cache TTL is 1 hour. Saving a `block_module` deletes its specific cache entry.
 - **Paged suppression**: Block areas without `menu` in their slug return no content on paged requests (`?paged=2`, etc.), both server-side and via the Interactivity API store.
