@@ -35,25 +35,6 @@ export default function QueryA({
 }) {
 	const [blockAreaId, blockAreaName] = useTaxonomy(TAXONOMY, blockAreaSlug);
 
-	const createNewPrompt = (
-		<span>
-			No Block Area could be found with that name, please create a new
-			one.{' '}
-			<Button
-				variant="link"
-				onClick={() =>
-					setAttributes({
-						wizardIsCreatingNewBlockArea: true,
-						blockAreaSlug: null,
-						blockAreaQueryComplete: false,
-					})
-				}
-			>
-				{__('Create New Block Area', 'prc-platform-core')}
-			</Button>
-		</span>
-	);
-
 	return (
 		<Step>
 			{!wizardIsCreatingNewBlockArea && (
@@ -69,7 +50,6 @@ export default function QueryA({
 					searchValue={blockAreaName || ''}
 					onSelect={(entity) => {
 						const slug = entity?.entitySlug ?? entity?.slug;
-						console.log('query a WPEntitySearch entity: ', entity);
 						if (slug) {
 							setBlockAreaSlug(slug);
 						}
@@ -78,18 +58,54 @@ export default function QueryA({
 					onKeyESC={() => {}}
 					perPage={10}
 					showExcerpt={true}
-					createNew={createNewPrompt}
+					createNew={(searchString) => (
+						<span>
+							{`No Block Area named "${searchString}" exists.`}{' '}
+							<Button
+								variant="link"
+								onClick={() =>
+									setAttributes({
+										wizardIsCreatingNewBlockArea: true,
+										wizardNewBlockAreaName:
+											searchString ?? '',
+										blockAreaSlug: undefined,
+										blockAreaQueryComplete: false,
+									})
+								}
+							>
+								{__(
+									'Create New Block Area',
+									'prc-platform-core'
+								)}
+							</Button>
+						</span>
+					)}
 				/>
 			)}
 
 			{wizardIsCreatingNewBlockArea && (
-				<TextControl
-					label={__('New Block Area Name', 'prc-platform-core')}
-					value={wizardNewBlockAreaName}
-					onChange={(value) =>
-						setAttributes({ wizardNewBlockAreaName: value })
-					}
-				/>
+				<>
+					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('New Block Area Name', 'prc-platform-core')}
+						value={wizardNewBlockAreaName}
+						onChange={(value) =>
+							setAttributes({ wizardNewBlockAreaName: value })
+						}
+					/>
+					<Button
+						variant="link"
+						onClick={() =>
+							setAttributes({
+								wizardIsCreatingNewBlockArea: false,
+								wizardNewBlockAreaName: '',
+							})
+						}
+					>
+						{__('Search existing instead', 'prc-platform-core')}
+					</Button>
+				</>
 			)}
 		</Step>
 	);

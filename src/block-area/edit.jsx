@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-/* eslint-disable @wordpress/no-unsafe-wp-apis */
 /**
  * External Dependencies
  */
@@ -15,8 +14,13 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal Dependencies
  */
-import { useBlockModules, useTaxonomyInfo } from './hooks';
+import {
+	useBlockModules,
+	useBlockModuleTaxonomies,
+	useTaxonomyInfo,
+} from './hooks';
 import { POST_TYPE, POST_TYPE_LABEL } from './constants';
+import { parseTaxonomyTemplate } from './term-source';
 
 import InspectorControls from './inspector-controls';
 import BlockAreaWizard from './block-area-wizard';
@@ -32,36 +36,39 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 		blockAreaQueryComplete,
 	} = attributes;
 	const { templateSlug } = context;
+	const { taxonomies } = useBlockModuleTaxonomies();
+	const taxonomySlugs = useMemo(
+		() => taxonomies.map((taxonomy) => taxonomy.slug),
+		[taxonomies]
+	);
+	const parsedTemplate = useMemo(
+		() => parseTaxonomyTemplate(templateSlug, taxonomySlugs),
+		[templateSlug, taxonomySlugs]
+	);
+	const restBase = useMemo(
+		() =>
+			taxonomies.find((taxonomy) => taxonomy.slug === taxonomyName)
+				?.restBase,
+		[taxonomies, taxonomyName]
+	);
 
 	const [postStatus, setPostStatus] = useState('publish');
 	const { setPostIds } = useDispatch('prc-platform/block-area-context');
 
-	// Theres a lot going on here so we want to optimize performance as much as possible. Below are a lot of useMemo calls to memoize the values these happen in the order they are used in the component, do not change the order.
-
-	const isTaxonomyTemplate = useMemo(() => {
-		return (
-			undefined !== templateSlug &&
-			!!taxonomyName &&
-			templateSlug.includes(`${taxonomyName}-`)
-		);
-	}, [templateSlug, taxonomyName]);
-
-	// If we are inheriting the term from the template we need to set the term slug to the template slug.
 	const taxTermSlug = useMemo(() => {
 		if (
-			true === inheritTermFromTemplate &&
-			!taxonomyTermSlug &&
-			isTaxonomyTemplate
+			inheritTermFromTemplate &&
+			parsedTemplate?.taxonomy === taxonomyName &&
+			parsedTemplate?.termSlug
 		) {
-			return templateSlug.replace(`${taxonomyName}-`, '');
+			return parsedTemplate.termSlug;
 		}
 		return taxonomyTermSlug || false;
 	}, [
 		inheritTermFromTemplate,
-		isTaxonomyTemplate,
-		templateSlug,
-		taxonomyTermSlug,
+		parsedTemplate,
 		taxonomyName,
+		taxonomyTermSlug,
 	]);
 
 	const { blockAreaName, blockAreaId, taxonomyTermName, taxonomyTermId } =
@@ -87,7 +94,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 		enabled: true,
 		blockAreaId: blockArea?.id,
 		taxonomyTermId: taxonomy?.id,
-		taxonomyName,
+		restBase,
 		ref,
 		args: { status: postStatus },
 	});
@@ -174,6 +181,7 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 							blockAreaId,
 							taxonomyName,
 							taxonomyTermId,
+							restBase,
 							setAttributes,
 						}}
 					/>
@@ -189,6 +197,8 @@ export default function Edit({ attributes, setAttributes, clientId, context }) {
 				blockModule={blockModule}
 				postStatus={postStatus}
 				setPostStatus={setPostStatus}
+				templateSlug={templateSlug}
+				restBase={restBase}
 			/>
 		</InnerBlocksAsSyncedContent>
 	);

@@ -41,20 +41,14 @@
       "role": "local",
       "default": ""
     },
-    "wizardAllowTaxonomySelection": {
-      "type": "boolean",
-      "role": "local",
-      "default": false
-    },
     "wizardIsCreatingNewBlockArea": {
       "type": "boolean",
       "role": "local",
       "default": false
     },
-    "wizardQueryCPhase": {
+    "wizardTermSource": {
       "type": "string",
-      "role": "local",
-      "default": "review"
+      "role": "local"
     }
   },
   "example": {

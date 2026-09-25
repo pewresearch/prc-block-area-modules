@@ -8,7 +8,7 @@ import { cleanForSlug } from '@wordpress/url';
 /**
  * Internal Dependencies
  */
-import { TAXONOMY, TAXONOMY_LABEL, POST_TYPE_LABEL } from '../constants';
+import { TAXONOMY } from '../constants';
 
 export default async function createBlockArea(blockAreaName) {
 	const { saveEntityRecord } = dispatch(coreStore);
@@ -19,7 +19,6 @@ export default async function createBlockArea(blockAreaName) {
 		slug,
 	});
 	if (newBlockArea) {
-		console.log('createBlockArea ->', newBlockArea);
 		return newBlockArea?.slug;
 	}
 

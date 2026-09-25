@@ -1,12 +1,7 @@
 /**
- * External Dependencies
- */
-
-/**
  * WordPress Dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { TextControl, FlexBlock } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -18,14 +13,13 @@ import { POST_TYPE, POST_TYPE_LABEL } from '../constants';
 import BlockModuleCreate from '../block-module-create';
 
 export default function BlockModuleControl({
-	attributes,
 	setAttributes,
 	blockArea,
 	taxonomy,
 	blockModule,
+	restBase,
 }) {
-	const { taxonomyName } = attributes;
-	const { id, name, slug } = blockModule;
+	const { id } = blockModule;
 
 	const blockAreaId = blockArea?.id;
 	const taxonomyId = taxonomy?.id;
@@ -37,7 +31,6 @@ export default function BlockModuleControl({
 		'title',
 		id
 	);
-	const [blockModuleLink] = useEntityProp('postType', POST_TYPE, 'link', id);
 
 	if (!id) {
 		return null;
@@ -48,6 +41,7 @@ export default function BlockModuleControl({
 			<FlexBlock>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={`${POST_TYPE_LABEL} Title`}
 					value={decodeEntities(blockModuleTitle)}
 					onChange={setBlockModuleTitle}
@@ -57,8 +51,8 @@ export default function BlockModuleControl({
 				<BlockModuleCreate
 					{...{
 						blockAreaId,
-						taxonomyName,
 						taxonomyTermId: taxonomyId,
+						restBase,
 						setAttributes,
 					}}
 				/>

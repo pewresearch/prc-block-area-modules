@@ -21,22 +21,8 @@ export default function useTaxonomyInfo(
 	taxonomyName = null,
 	taxonomyTermSlug = null
 ) {
-	let taxRestName = taxonomyName;
-	if (taxonomyName === 'category') {
-		taxRestName = 'categories';
-	}
-	const [taxId, taxName] = useTaxonomy(taxRestName, taxonomyTermSlug);
+	const [taxId, taxName] = useTaxonomy(taxonomyName, taxonomyTermSlug);
 	const [blockAreaId, blockAreaName] = useTaxonomy(TAXONOMY, blockAreaSlug);
-	console.log(
-		'useTaxonomyInfo',
-		blockAreaSlug,
-		taxonomyName,
-		taxonomyTermSlug,
-		taxId,
-		taxName,
-		blockAreaId,
-		blockAreaName
-	);
 
 	return {
 		blockAreaId,

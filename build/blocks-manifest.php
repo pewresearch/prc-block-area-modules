@@ -44,20 +44,14 @@ return array(
 				'role' => 'local',
 				'default' => ''
 			),
-			'wizardAllowTaxonomySelection' => array(
-				'type' => 'boolean',
-				'role' => 'local',
-				'default' => false
-			),
 			'wizardIsCreatingNewBlockArea' => array(
 				'type' => 'boolean',
 				'role' => 'local',
 				'default' => false
 			),
-			'wizardQueryCPhase' => array(
+			'wizardTermSource' => array(
 				'type' => 'string',
-				'role' => 'local',
-				'default' => 'review'
+				'role' => 'local'
 			)
 		),
 		'example' => array(

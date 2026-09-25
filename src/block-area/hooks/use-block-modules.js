@@ -18,19 +18,17 @@ import { POST_TYPE_REST_BASE, TAXONOMY } from '../constants';
  * @param {Object}  options                Options object.
  * @param {number}  options.blockAreaId    The block area id.
  * @param {number}  options.taxonomyTermId The term id.
- * @param {string}  options.taxonomy       The taxonomy name.
+ * @param {string}  options.restBase       The taxonomy REST base used as the query param.
  * @param {number}  options.ref            The block module id to include.
  * @param {number}  options.excludeId      The block module id to exclude.
  * @param {boolean} options.enabled        Whether the hook is enabled.
  * @param {Object}  options.args           Additional query arguments.
- * @param           options.categoryId
- * @param           options.taxonomyName
  * @return {Object} The block modules and related data.
  */
 export default function useBlockModules({
 	blockAreaId = null,
 	taxonomyTermId = null,
-	taxonomyName = null,
+	restBase = null,
 	ref = null,
 	excludeId = null,
 	enabled = false,
@@ -45,12 +43,8 @@ export default function useBlockModules({
 	if (null !== blockAreaId) {
 		queryArgs[TAXONOMY] = [blockAreaId];
 	}
-	if (null !== taxonomyTermId) {
-		let taxName = taxonomyName;
-		if (taxonomyName === 'category') {
-			taxName = 'categories';
-		}
-		queryArgs[taxName] = [taxonomyTermId];
+	if (undefined !== taxonomyTermId && null !== taxonomyTermId && restBase) {
+		queryArgs[restBase] = [taxonomyTermId];
 	}
 	if (blockAreaId && taxonomyTermId) {
 		queryArgs.tax_relation = 'AND';

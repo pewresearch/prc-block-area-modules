@@ -16,8 +16,8 @@ import { createBlockModule } from './functions';
 
 export default function BlockModuleCreate({
 	blockAreaId,
-	taxonomyName,
 	taxonomyTermId,
+	restBase,
 	setAttributes,
 }) {
 	const [displayModal, setDisplayModal] = useState(false);
@@ -25,6 +25,7 @@ export default function BlockModuleCreate({
 	return (
 		<Fragment>
 			<Button
+				__next40pxDefaultSize
 				variant="secondary"
 				onClick={() => {
 					setDisplayModal(!displayModal);
@@ -43,11 +44,10 @@ export default function BlockModuleCreate({
 							createBlockModule(
 								newTitle,
 								blockAreaId,
-								taxonomyName,
+								restBase,
 								taxonomyTermId,
 								'publish'
 							).then((response) => {
-								console.log('then...', response);
 								setAttributes({ ref: response.id });
 							});
 						},

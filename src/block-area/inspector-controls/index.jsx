@@ -20,6 +20,8 @@ export default function Controls({
 	blockModule,
 	postStatus,
 	setPostStatus,
+	templateSlug,
+	restBase,
 }) {
 	const { ref } = attributes;
 	const showBlockAreaPanel = Boolean(ref || blockArea?.id);
@@ -45,7 +47,7 @@ export default function Controls({
 						<TaxonomyControl
 							attributes={attributes}
 							setAttributes={setAttributes}
-							taxonomy={taxonomy}
+							templateSlug={templateSlug}
 						/>
 					</Flex>
 				</PanelBody>
@@ -54,11 +56,11 @@ export default function Controls({
 				<Flex direction="column" gap="10px">
 					<BlockModuleControl
 						{...{
-							attributes,
 							setAttributes,
 							blockArea,
 							taxonomy,
 							blockModule,
+							restBase,
 						}}
 					/>
 				</Flex>

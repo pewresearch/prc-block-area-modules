@@ -259,6 +259,7 @@ class Block_Area_Context_Provider {
 			return false;
 		}
 
+		$tax_check = false;
 		if ( true === $inherit_term_from_template ) {
 			global $wp_query;
 			if ( null !== $taxonomy_name ) {
@@ -369,10 +370,10 @@ class Block_Area_Context_Provider {
 		wp_reset_postdata();
 
 		if ( $use_cache ) {
-			wp_cache_set( $cache_id, $module_id ?: 0, self::$module_id_cache_key, self::MODULE_CACHE_TTL );
+			wp_cache_set( $cache_id, $module_id ? $module_id : 0, self::$module_id_cache_key, self::MODULE_CACHE_TTL );
 		}
 
-		return $module_id ?: false;
+		return $module_id ? $module_id : false;
 	}
 
 	/**

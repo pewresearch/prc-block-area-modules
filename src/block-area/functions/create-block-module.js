@@ -7,17 +7,12 @@ import { dispatch } from '@wordpress/data';
 /**
  * Internal Dependencies
  */
-import {
-	POST_TYPE,
-	POST_TYPE_LABEL,
-	TAXONOMY,
-	TAXONOMY_REST_BASE,
-} from '../constants';
+import { POST_TYPE, TAXONOMY_REST_BASE } from '../constants';
 
 export default async function createBlockModule(
 	blockModuleTitle,
 	blockAreaId,
-	taxonomyName,
+	restBase,
 	taxonomyTermId,
 	status = 'publish'
 ) {
@@ -28,8 +23,8 @@ export default async function createBlockModule(
 	if (blockAreaId) {
 		args[TAXONOMY_REST_BASE] = [blockAreaId];
 	}
-	if (taxonomyTermId) {
-		args[taxonomyName] = [taxonomyTermId];
+	if (taxonomyTermId && restBase) {
+		args[restBase] = [taxonomyTermId];
 	}
 
 	const { saveEntityRecord } = dispatch(coreStore);
@@ -37,7 +32,6 @@ export default async function createBlockModule(
 	const newBlockModule = await saveEntityRecord('postType', POST_TYPE, args);
 
 	if (newBlockModule) {
-		console.log('onCreateBlockModule', newBlockModule);
 		return newBlockModule;
 	}
 

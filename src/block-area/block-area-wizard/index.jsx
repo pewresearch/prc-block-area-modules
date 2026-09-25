@@ -16,13 +16,19 @@ import {
 import { Intro, QueryA, QueryB, QueryC, SelectA, CreateA } from './steps';
 import Icon from '../icon';
 import { createBlockArea } from '../functions';
+import { useBlockModuleTaxonomies } from '../hooks';
+import {
+	TERM_SOURCE,
+	getTermSource,
+	termSourcePatch,
+	parseTaxonomyTemplate,
+} from '../term-source';
 
 const WIZARD_RESET = {
 	wizardStep: 'intro',
 	wizardNewBlockAreaName: '',
-	wizardAllowTaxonomySelection: false,
 	wizardIsCreatingNewBlockArea: false,
-	wizardQueryCPhase: 'review',
+	wizardTermSource: undefined,
 };
 
 const PREVIOUS_STEP = {
@@ -50,23 +56,44 @@ export default function BlockAreaWizard({
 	clientId,
 }) {
 	const { templateSlug } = context;
+	const { taxonomies } = useBlockModuleTaxonomies();
+	const taxonomySlugs = useMemo(
+		() => taxonomies.map((taxonomy) => taxonomy.slug),
+		[taxonomies]
+	);
+	const parsedTemplate = useMemo(
+		() => parseTaxonomyTemplate(templateSlug, taxonomySlugs),
+		[templateSlug, taxonomySlugs]
+	);
 
 	const blockAreaSlug = attributes?.blockAreaSlug ?? '';
 	const taxonomyName = attributes?.taxonomyName ?? '';
 	const taxonomyTermSlug = attributes?.taxonomyTermSlug ?? '';
-	const inheritTermFromTemplate = Boolean(
-		attributes?.inheritTermFromTemplate
-	);
 
 	const wizardStep = attributes?.wizardStep ?? 'intro';
 	const wizardNewBlockAreaName = attributes?.wizardNewBlockAreaName ?? '';
-	const wizardAllowTaxonomySelection = Boolean(
-		attributes?.wizardAllowTaxonomySelection
-	);
 	const wizardIsCreatingNewBlockArea = Boolean(
 		attributes?.wizardIsCreatingNewBlockArea
 	);
-	const wizardQueryCPhase = attributes?.wizardQueryCPhase ?? 'review';
+
+	const effectiveSource = useMemo(() => {
+		if (attributes?.wizardTermSource) {
+			return attributes.wizardTermSource;
+		}
+		const fromAttrs = getTermSource(attributes);
+		if (fromAttrs !== TERM_SOURCE.NONE) {
+			return fromAttrs;
+		}
+		if (parsedTemplate) {
+			return TERM_SOURCE.TEMPLATE;
+		}
+		return TERM_SOURCE.NONE;
+	}, [attributes, parsedTemplate]);
+
+	const templateTaxonomyLabel =
+		taxonomies.find(
+			(taxonomy) => taxonomy.slug === parsedTemplate?.taxonomy
+		)?.name || parsedTemplate?.taxonomy;
 
 	const setBlockAreaSlug = useCallback(
 		(value) => {
@@ -78,27 +105,21 @@ export default function BlockAreaWizard({
 		[setAttributes]
 	);
 
-	const setTaxonomyTermSlug = useCallback(
-		(value) => {
-			setAttributes({ taxonomyTermSlug: value });
+	const handleSourceChange = useCallback(
+		(next) => {
+			setAttributes({
+				wizardTermSource: next,
+				...termSourcePatch(next, {
+					taxonomyName:
+						next === TERM_SOURCE.TEMPLATE
+							? parsedTemplate?.taxonomy
+							: taxonomyName,
+					taxonomyTermSlug,
+				}),
+			});
 		},
-		[setAttributes]
+		[setAttributes, parsedTemplate, taxonomyName, taxonomyTermSlug]
 	);
-
-	const setInheritTermFromTemplate = useCallback(
-		(value) => {
-			setAttributes({ inheritTermFromTemplate: value });
-		},
-		[setAttributes]
-	);
-
-	const isTaxonomyTemplate = useMemo(() => {
-		return (
-			undefined !== templateSlug &&
-			!!taxonomyName &&
-			templateSlug.includes(`${taxonomyName}-`)
-		);
-	}, [templateSlug, taxonomyName]);
 
 	const canProceedQueryA = useMemo(() => {
 		if (wizardIsCreatingNewBlockArea) {
@@ -108,29 +129,27 @@ export default function BlockAreaWizard({
 	}, [wizardIsCreatingNewBlockArea, wizardNewBlockAreaName, blockAreaSlug]);
 
 	const canProceedQueryB = useMemo(() => {
-		if (!wizardAllowTaxonomySelection) {
-			return true;
-		}
-		if (inheritTermFromTemplate && isTaxonomyTemplate) {
+		if (
+			effectiveSource === TERM_SOURCE.NONE ||
+			effectiveSource === TERM_SOURCE.TEMPLATE
+		) {
 			return true;
 		}
 		return Boolean(taxonomyTermSlug && taxonomyTermSlug.length > 0);
-	}, [
-		wizardAllowTaxonomySelection,
-		inheritTermFromTemplate,
-		isTaxonomyTemplate,
-		taxonomyTermSlug,
-	]);
+	}, [effectiveSource, taxonomyTermSlug]);
 
 	const handleQueryCInsert = useCallback(async () => {
 		const newAttrs = {
-			inheritTermFromTemplate,
+			...termSourcePatch(effectiveSource, {
+				taxonomyName:
+					effectiveSource === TERM_SOURCE.TEMPLATE
+						? parsedTemplate?.taxonomy
+						: taxonomyName,
+				taxonomyTermSlug,
+			}),
 			blockAreaQueryComplete: true,
 			...WIZARD_RESET,
 		};
-		if (taxonomyTermSlug) {
-			newAttrs.taxonomyTermSlug = taxonomyTermSlug;
-		}
 		if (wizardNewBlockAreaName.trim()) {
 			const newBlockAreaSlug = await createBlockArea(
 				wizardNewBlockAreaName.trim()
@@ -146,7 +165,9 @@ export default function BlockAreaWizard({
 			setAttributes(newAttrs);
 		}
 	}, [
-		inheritTermFromTemplate,
+		effectiveSource,
+		parsedTemplate,
+		taxonomyName,
 		taxonomyTermSlug,
 		wizardNewBlockAreaName,
 		blockAreaSlug,
@@ -177,22 +198,11 @@ export default function BlockAreaWizard({
 				onClick: () => {
 					setAttributes({
 						wizardStep: 'query-c',
-						wizardQueryCPhase: 'review',
 					});
 				},
 			};
 		}
 		if (wizardStep === 'query-c') {
-			if (wizardQueryCPhase === 'review') {
-				return {
-					text: __('Confirm Settings', 'prc-platform-core'),
-					variant: 'secondary',
-					disabled: false,
-					onClick: () => {
-						setAttributes({ wizardQueryCPhase: 'confirm' });
-					},
-				};
-			}
 			return {
 				text: __('Insert Block Area', 'prc-platform-core'),
 				variant: 'primary',
@@ -205,7 +215,6 @@ export default function BlockAreaWizard({
 		return null;
 	}, [
 		wizardStep,
-		wizardQueryCPhase,
 		canProceedQueryA,
 		canProceedQueryB,
 		setAttributes,
@@ -218,9 +227,6 @@ export default function BlockAreaWizard({
 			return;
 		}
 		const patch = { wizardStep: prev };
-		if (wizardStep === 'query-c') {
-			patch.wizardQueryCPhase = 'review';
-		}
 		if (prev === 'intro') {
 			Object.assign(patch, {
 				wizardIsCreatingNewBlockArea: false,
@@ -267,15 +273,11 @@ export default function BlockAreaWizard({
 				)}
 				{wizardStep === 'query-b' && (
 					<QueryB
-						taxonomyName={taxonomyName}
-						taxonomyTermSlug={taxonomyTermSlug}
-						setTaxonomyTermSlug={setTaxonomyTermSlug}
-						templateSlug={templateSlug}
-						allowTaxonomySelection={wizardAllowTaxonomySelection}
-						inheritTermFromTemplate={inheritTermFromTemplate}
-						setInheritTermFromTemplate={setInheritTermFromTemplate}
+						attributes={attributes}
 						setAttributes={setAttributes}
-						isTaxonomyTemplate={isTaxonomyTemplate}
+						templateSlug={templateSlug}
+						source={effectiveSource}
+						onSourceChange={handleSourceChange}
 					/>
 				)}
 				{wizardStep === 'query-c' && (
@@ -283,7 +285,8 @@ export default function BlockAreaWizard({
 						blockAreaSlug={blockAreaSlug}
 						taxonomyName={taxonomyName}
 						taxonomyTermSlug={taxonomyTermSlug}
-						inheritTermFromTemplate={inheritTermFromTemplate}
+						termSource={effectiveSource}
+						taxonomyLabel={templateTaxonomyLabel}
 						newBlockAreaName={wizardNewBlockAreaName}
 					/>
 				)}
@@ -327,6 +330,7 @@ export default function BlockAreaWizard({
 						)}
 						{wizardStep !== 'select-a' && primaryToolbar && (
 							<Button
+								__next40pxDefaultSize
 								variant={primaryToolbar.variant}
 								disabled={primaryToolbar.disabled}
 								onClick={primaryToolbar.onClick}
