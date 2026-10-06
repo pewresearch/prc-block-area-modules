@@ -19,7 +19,7 @@ export default function BlockModuleControl({
 	blockModule,
 	restBase,
 }) {
-	const { id } = blockModule;
+	const id = blockModule?.id;
 
 	const blockAreaId = blockArea?.id;
 	const taxonomyId = taxonomy?.id;
