@@ -19,7 +19,7 @@
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       prc-block-area-modules
- * Requires Plugins:  prc-scripts
+ * Requires Plugins:  prc-shared
  */
 
 namespace PRC\Platform\Block_Area_Modules;
