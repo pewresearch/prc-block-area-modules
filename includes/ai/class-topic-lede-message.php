@@ -57,6 +57,11 @@ class Topic_Lede_Message {
 			if ( $module['stories_in_layout'] < count( $result['picks'] ) ) {
 				$md .= "\nThe current layout has " . $module['stories_in_layout'] . ' story slots, so only the first ' . $module['stories_in_layout'] . ' picks were placed.';
 			}
+			if ( ! empty( $module['preview_pending'] ) ) {
+				$md .= 'published' === $result['status']
+					? "\nA screenshot will follow in this thread."
+					: "\nA screenshot and a Publish button will follow in this thread.";
+			}
 		}
 
 		if ( array() !== $result['headlines'] ) {

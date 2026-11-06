@@ -35,7 +35,7 @@ Use prc-block-area-modules/curate-topic-lede:
 3. Show the preview: post the message field as is. It lists the headlines and the picks with reasons.
 4. Write only after the editor confirms in this thread. Call it again with the same term and post_ids set to the preview post_ids, in the same order. Use mode="draft" when they say save, draft, or yes. Use mode="publish" only when they say publish, go live, or ship it.
 5. If the editor wants changes (drop a story, swap the lead, use a post ID), edit post_ids to match and preview again with those post_ids before you write.
-6. After a write, post the message field. It has the edit link or the live topic page link.
+6. After a write, post the message field. It has the edit link or the live topic page link. A screenshot of the module, and a Publish button for a draft, then come to the thread by themselves. Do not post them or promise anything more. After a draft, do not call mode="publish" unless the editor asks in text; the Publish button publishes the draft.
 Never call mode="publish" or mode="draft" in the same turn as the first preview.';
 
 	/**

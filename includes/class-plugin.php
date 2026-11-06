@@ -82,6 +82,7 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-model.php';
 		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-writer.php';
 		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-message.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-preview.php';
 		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-curate-topic-lede-ability.php';
 		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-system.php';
 
@@ -108,6 +109,7 @@ class Plugin {
 		new Ability_Categories( $this->get_loader() );
 		new Curate_Topic_Lede_Ability( $this->get_loader() );
 		new Topic_Lede_System( $this->get_loader() );
+		new Topic_Lede_Preview( $this->get_loader() );
 	}
 
 	/**

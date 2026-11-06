@@ -29,10 +29,10 @@ class Topic_Lede_Layout {
 	public const STORY_ITEM = 'prc-block/story-item';
 
 	/**
-	 * Attributes that describe one specific story. They are removed on swap so
-	 * the story item renders the new post's own title, excerpt, date, label,
-	 * and art. Layout attributes (image slot and size, header size, toggles)
-	 * stay as the editor set them.
+	 * Attributes that describe one specific story. They are removed on swap and
+	 * refilled from the pick's story data, because the story item editor shows
+	 * saved attributes and does not load them from postId. Layout attributes
+	 * (image slot and size, header size, toggles) stay as the editor set them.
 	 *
 	 * @var string[]
 	 */
@@ -112,8 +112,9 @@ class Topic_Lede_Layout {
 	/**
 	 * Point one story item at a new post.
 	 *
-	 * @param array                               $block Story item block.
-	 * @param array{post_id:int,post_type:string} $pick  New post.
+	 * @param array $block Story item block.
+	 * @param array $pick  New post: post_id, post_type, and optional story
+	 *                     (title, excerpt, url, label, date, art by image size).
 	 * @return array
 	 */
 	private static function with_post( array $block, array $pick ): array {
@@ -124,11 +125,31 @@ class Topic_Lede_Layout {
 		$attrs['postId']   = (int) $pick['post_id'];
 		$attrs['postType'] = (string) ( $pick['post_type'] ?? 'post' );
 
+		$story = (array) ( $pick['story'] ?? array() );
+		foreach ( array( 'title', 'url', 'label', 'date' ) as $key ) {
+			if ( '' !== (string) ( $story[ $key ] ?? '' ) ) {
+				$attrs[ $key ] = (string) $story[ $key ];
+			}
+		}
+
+		$art = $story['art'][ $attrs['imageSize'] ?? 'A1' ] ?? null;
+		if ( is_array( $art ) && '' !== (string) ( $art['rawUrl'] ?? '' ) ) {
+			$attrs['image']      = (string) $art['rawUrl'];
+			$attrs['isChartArt'] = (bool) ( $art['chartArt'] ?? false );
+		}
+
 		$block['attrs'] = $attrs;
 		// The saved description and extra markup belong to the old story.
 		$block['innerBlocks']  = array();
 		$block['innerHTML']    = '';
 		$block['innerContent'] = array();
+
+		$excerpt = trim( (string) ( $story['excerpt'] ?? '' ) );
+		if ( '' !== $excerpt ) {
+			// The excerpt attribute is sourced from this markup, not from attrs.
+			$block['innerHTML']    = '<div class="description">' . htmlspecialchars( $excerpt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false ) . '</div>';
+			$block['innerContent'] = array( $block['innerHTML'] );
+		}
 
 		return $block;
 	}

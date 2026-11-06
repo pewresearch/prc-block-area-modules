@@ -72,6 +72,7 @@ class Topic_Lede_Writer {
 					return array(
 						'post_id'   => (int) $pick['post_id'],
 						'post_type' => (string) $pick['post_type'],
+						'story'     => self::story_attributes( (int) $pick['post_id'] ),
 					);
 				},
 				$picks
@@ -138,6 +139,57 @@ class Topic_Lede_Writer {
 			'replaces_module'   => $current_id ? (int) $current_id : 0,
 			'stories_in_layout' => (int) $swapped['replaced'],
 		);
+	}
+
+	/**
+	 * Story item content for one post.
+	 *
+	 * The story item editor shows these saved attributes and does not load the
+	 * post from postId, so they match what its post picker stores.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array{title:string,excerpt:string,url:string,label:string,date:string,art:array}
+	 */
+	private static function story_attributes( int $post_id ): array {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return array();
+		}
+
+		$art = function_exists( '\PRC\Platform\Art_Direction\get' ) ? \PRC\Platform\Art_Direction\get( $post_id, 'all' ) : array();
+
+		return array(
+			'title'   => html_entity_decode( get_the_title( $post ), ENT_QUOTES ),
+			'excerpt' => trim( html_entity_decode( wp_strip_all_tags( get_the_excerpt( $post ) ), ENT_QUOTES ) ),
+			'url'     => (string) get_permalink( $post ),
+			'label'   => self::format_label( $post ),
+			'date'    => (string) get_the_date( 'M j, Y', $post ),
+			'art'     => is_array( $art ) ? $art : array(),
+		);
+	}
+
+	/**
+	 * Format label for a post, with the same rules as the story item render.
+	 *
+	 * @param \WP_Post $post Post.
+	 * @return string
+	 */
+	private static function format_label( \WP_Post $post ): string {
+		$terms = wp_get_object_terms( $post->ID, 'formats' );
+		if ( is_wp_error( $terms ) || array() === $terms ) {
+			return in_array( $post->post_type, array( 'short-read', 'feature', 'decoded' ), true ) ? $post->post_type : 'Report';
+		}
+
+		if ( count( $terms ) > 1 && function_exists( '\PRC\Primitives\BlockUtils\get_primary_term_id' ) ) {
+			$primary_id = (int) \PRC\Primitives\BlockUtils\get_primary_term_id( $post->ID, 'formats' );
+			foreach ( $terms as $term ) {
+				if ( (int) $term->term_id === $primary_id ) {
+					return html_entity_decode( $term->name, ENT_QUOTES );
+				}
+			}
+		}
+
+		return html_entity_decode( $terms[0]->name, ENT_QUOTES );
 	}
 
 	/**

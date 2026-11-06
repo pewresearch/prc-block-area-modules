@@ -356,6 +356,8 @@ class Curate_Topic_Lede_Ability {
 			if ( is_wp_error( $module ) ) {
 				return $module;
 			}
+			$module['preview_pending'] = Topic_Lede_Preview::maybe_schedule( $module, (int) $actor->ID );
+
 			$result['status'] = 'publish' === $input['mode'] ? 'published' : 'draft';
 			$result['module'] = $module;
 		}
