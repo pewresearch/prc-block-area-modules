@@ -76,6 +76,14 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . '/includes/class-admin-dataview-lists.php';
 		require_once plugin_dir_path( __DIR__ ) . '/build/block-area-context-provider/class-block-area-context-provider.php';
 		require_once plugin_dir_path( __DIR__ ) . '/build/block-area/class-block-area.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-ability-categories.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-layout.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-selection.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-model.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-writer.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-message.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-curate-topic-lede-ability.php';
+		require_once plugin_dir_path( __DIR__ ) . '/includes/ai/class-topic-lede-system.php';
 
 		// Initialize the loader.
 		$this->loader = new Loader();
@@ -97,6 +105,9 @@ class Plugin {
 		new Admin_Dataview_Lists( $this->get_loader() );
 		new Block_Area_Context_Provider( $this->get_loader() );
 		new Block_Area( $this->get_loader() );
+		new Ability_Categories( $this->get_loader() );
+		new Curate_Topic_Lede_Ability( $this->get_loader() );
+		new Topic_Lede_System( $this->get_loader() );
 	}
 
 	/**

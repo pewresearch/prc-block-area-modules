@@ -56,19 +56,12 @@ class Content_Type {
 		// Register the block modules rest fields.
 		$loader->add_action( 'rest_api_init', $this, 'register_rest_fields' );
 
-		// Update the story item ids when a block module is updated.
-		$loader->add_action(
-			'prc_platform_on_block_module_update',
-			$this,
-			'on_block_module_update_store_story_item_ids'
-		);
-
-		// Clear the cache when a block module is updated.
-		$loader->add_action(
-			'prc_platform_on_block_module_update',
-			$this,
-			'clear_cache_on_block_module_saves'
-		);
+		// Store story item ids and clear caches when a block module is updated or first published.
+		// The pipeline fires `publish` (not `update`) when a draft goes live.
+		foreach ( array( 'prc_platform_on_block_module_update', 'prc_platform_on_block_module_publish' ) as $hook ) {
+			$loader->add_action( $hook, $this, 'on_block_module_update_store_story_item_ids' );
+			$loader->add_action( $hook, $this, 'clear_cache_on_block_module_saves' );
+		}
 	}
 
 	/**
@@ -277,6 +270,7 @@ class Content_Type {
 	 * Store story item ids on block module update.
 	 *
 	 * @hook prc_platform_on_block_module_update
+	 * @hook prc_platform_on_block_module_publish
 	 *
 	 * @param mixed $post The post.
 	 * @return void
@@ -301,6 +295,7 @@ class Content_Type {
 	 * Clear the cache when a block module is updated.
 	 *
 	 * @hook prc_platform_on_block_module_update
+	 * @hook prc_platform_on_block_module_publish
 	 * @param mixed $post The post.
 	 * @return void
 	 */

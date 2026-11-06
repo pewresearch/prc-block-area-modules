@@ -20,33 +20,36 @@ Provides an editorially curated system for populating named zones in a block the
 
 ## Key files
 
-| File | Purpose |
-|---|---|
-| `prc-block-area-modules.php` | Plugin entry point; defines constants, loads dependencies, fires `run_prc_block_area_modules()` |
-| `includes/class-content-type.php` | Registers `block_module` post type, `block_area` taxonomy, `_story_item_ids` post meta + REST field, and story-item ID extraction on save |
-| `includes/class-plugin.php` | Wires `Content_Type`, `Block_Area`, and `Block_Area_Context_Provider` into the loader |
-| `src/block-area/block.json` | Block metadata for `prc-platform/block-area` (attributes, supports, usesContext) |
-| `src/block-area/class-block-area.php` | Server render callback; resolves matching `block_module` via `WP_Query`, outputs Interactivity API wrapper |
-| `src/block-area/edit.jsx` | Editor UI — setup wizard on first use, `InnerBlocksAsSyncedContent` once a module is linked |
-| `src/block-area/variations.js` | Four block variations scoped by taxonomy (category, regions-countries, collection, prc_newsletter_list) |
-| `src/block-area/view.js` | Interactivity API store — hides non-menu block areas on paged requests |
-| `src/block-area-context-provider/class-block-area-context-provider.php` | Collects story item IDs from block modules, injects into query block context and main query |
-| `src/block-area-context-provider/block.json` | Block metadata for `prc-platform/block-area-context-provider` |
-| `src/block-area/hooks/use-block-modules.js` | Hook for fetching `block_module` posts in the editor by block area + taxonomy term |
-| `src/block-area/hooks/use-taxonomy-info.js` | Hook for resolving term/area names and IDs from slugs |
-| `src/block-area/block-area-wizard/` | Multi-step editor wizard (intro → select/query → create) for initial block area setup |
+| File                                                                    | Purpose                                                                                                                                   |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `prc-block-area-modules.php`                                            | Plugin entry point; defines constants, loads dependencies, fires `run_prc_block_area_modules()`                                           |
+| `includes/class-content-type.php`                                       | Registers `block_module` post type, `block_area` taxonomy, `_story_item_ids` post meta + REST field, and story-item ID extraction on save |
+| `includes/class-plugin.php`                                             | Wires `Content_Type`, `Block_Area`, and `Block_Area_Context_Provider` into the loader                                                     |
+| `src/block-area/block.json`                                             | Block metadata for `prc-platform/block-area` (attributes, supports, usesContext)                                                          |
+| `src/block-area/class-block-area.php`                                   | Server render callback; resolves matching `block_module` via `WP_Query`, outputs Interactivity API wrapper                                |
+| `src/block-area/edit.jsx`                                               | Editor UI — setup wizard on first use, `InnerBlocksAsSyncedContent` once a module is linked                                               |
+| `src/block-area/variations.js`                                          | Four block variations scoped by taxonomy (category, regions-countries, collection, prc_newsletter_list)                                   |
+| `src/block-area/view.js`                                                | Interactivity API store — hides non-menu block areas on paged requests                                                                    |
+| `src/block-area-context-provider/class-block-area-context-provider.php` | Collects story item IDs from block modules, injects into query block context and main query                                               |
+| `src/block-area-context-provider/block.json`                            | Block metadata for `prc-platform/block-area-context-provider`                                                                             |
+| `src/block-area/hooks/use-block-modules.js`                             | Hook for fetching `block_module` posts in the editor by block area + taxonomy term                                                        |
+| `src/block-area/hooks/use-taxonomy-info.js`                             | Hook for resolving term/area names and IDs from slugs                                                                                     |
+| `src/block-area/block-area-wizard/`                                     | Multi-step editor wizard (intro → select/query → create) for initial block area setup                                                     |
 
 ## Filters / hooks
 
-| Hook | Type | Direction | Description |
-|---|---|---|---|
-| `init` | Action | Consumed | Registers `block_module` post type, `block_area` taxonomy, post meta, and both blocks |
-| `rest_api_init` | Action | Consumed | Registers the `_story_item_ids` REST field on `block_module` |
-| `render_block_context` (priority 1) | Filter | Consumed | `construct_block_context` — finds the first `prc-platform/block-area` inside the context provider and pre-fetches its story item IDs |
-| `render_block_context` (priority 100) | Filter | Consumed | `execute_block_context` — injects collected story item IDs into `core/post-template` query context as `post__not_in` |
-| `pre_get_posts` | Action | Consumed | On category archive main queries (non-paged, non-front-page), excludes `topic-lede` story items from results |
-| `prc_platform_on_block_module_update` | Action | Consumed | Two callbacks: (1) re-indexes `_story_item_ids` from block content, (2) busts the object-cache entry for the module's block area + category |
-| `the_content` | Filter | Consumed | Applied to resolved `block_module` post content during `prc-platform/block-area` render |
+| Hook                                                                          | Type   | Direction | Description                                                                                                                                 |
+| ----------------------------------------------------------------------------- | ------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`                                                                        | Action | Consumed  | Registers `block_module` post type, `block_area` taxonomy, post meta, and both blocks                                                       |
+| `rest_api_init`                                                               | Action | Consumed  | Registers the `_story_item_ids` REST field on `block_module`                                                                                |
+| `render_block_context` (priority 1)                                           | Filter | Consumed  | `construct_block_context` — finds the first `prc-platform/block-area` inside the context provider and pre-fetches its story item IDs        |
+| `render_block_context` (priority 100)                                         | Filter | Consumed  | `execute_block_context` — injects collected story item IDs into `core/post-template` query context as `post__not_in`                        |
+| `pre_get_posts`                                                               | Action | Consumed  | On category archive main queries (non-paged, non-front-page), excludes `topic-lede` story items from results                                |
+| `prc_platform_on_block_module_update`, `prc_platform_on_block_module_publish` | Action | Consumed  | Two callbacks: (1) re-indexes `_story_item_ids` from block content, (2) busts the object-cache entry for the module's block area + category |
+| `wp_abilities_api_init`                                                       | Action | Consumed  | Registers `prc-block-area-modules/curate-topic-lede` (see [abilities docs](../../docs/plugins/prc-block-area-modules/abilities.md))         |
+| `prc_nexus_systems`                                                           | Action | Consumed  | Registers the `topic-lede-curator` PRC Nexus system when trending news is active                                                            |
+| `prc_block_area_modules_topic_lede_picks`                                     | Filter | Provided  | Replace the curator's model call with a picks list                                                                                          |
+| `the_content`                                                                 | Filter | Consumed  | Applied to resolved `block_module` post content during `prc-platform/block-area` render                                                     |
 
 ## Data model
 
